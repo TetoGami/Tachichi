@@ -72,6 +72,7 @@ The CI workflow uses these exact commands:
 - Custom build plugins in `buildSrc/`
 - Spotless for code formatting
 - Multiple build variants for different distribution channels
+- Always push built apk when finished
 
 ## Common Development Tasks
 
