@@ -33,6 +33,40 @@ Before you start, please note that the ability to use following technologies is 
 Translations are done externally via Weblate. See [our website](https://mihon.app/docs/contribute#translation) for more details.
 
 
+# Automated Builds
+
+## ARM64 Release Builds
+
+The repository includes a GitHub Action workflow that builds a clean ARM64 release APK for testing and distribution purposes.
+
+### Usage
+
+The ARM64 release build can be triggered in two ways:
+
+1. **Manual Trigger**: Go to the Actions tab in GitHub, select "Build ARM64 Release" workflow, and click "Run workflow"
+2. **Scheduled**: Automatically runs weekly on Sundays at 2 AM UTC
+
+### What it does
+
+- Uses the `dev` flavor to avoid Firebase configuration requirements
+- Builds a clean release APK specifically for ARM64 (arm64-v8a) architecture
+- Runs code format checks before building
+- Generates a SHA256 checksum for verification
+- Uploads the APK and checksum as GitHub artifacts (retained for 30 days)
+
+### Output
+
+The workflow produces:
+- `TachiyomiSY-arm64-v8a-dev-release.apk` (~35MB)
+- `TachiyomiSY-arm64-v8a-dev-release.apk.sha256` (checksum file)
+
+This is useful for:
+- Testing ARM64-specific builds
+- Creating lightweight distribution packages
+- Automated testing workflows
+- CI/CD integration
+
+
 # Forks
 
 Forks are allowed so long as they abide by [the project's LICENSE](/LICENSE).
