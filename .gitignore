@@ -18,3 +18,7 @@ local.properties
 # SY ignores
 google-services.json
 /app/src/main/assets/client_secrets.json
+
+# Release folder - include APK files
+!/release/
+!/release/*.apk
