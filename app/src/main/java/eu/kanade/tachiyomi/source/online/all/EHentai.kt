@@ -948,6 +948,9 @@ class EHentai(
             Filter.Header("Note: Will ignore other parameters!"),
             ToplistOptions(),
             Filter.Separator(),
+            Filter.Header("Local Sorting (applied after loading)"),
+            LocalSortFilter(),
+            Filter.Separator(),
             AutoCompleteTags(),
             Watched(isEnabled = exhPreferences.exhWatchedListDefaultState().get()),
             GenreGroup(),
@@ -1122,6 +1125,12 @@ class EHentai(
     class ReverseFilter : Filter.CheckBox("Reverse search results")
 
     class JumpSeekFilter : Filter.Text("Jump/Seek")
+
+    class LocalSortFilter : Filter.Sort(
+        "Local Sort",
+        arrayOf("None", "Score", "Pages", "Date", "Favorites", "Size"),
+        Selection(0, false),
+    )
 
     override val name = if (exh) {
         "ExHentai"
