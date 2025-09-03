@@ -1,0 +1,78 @@
+name: Build ARM64 Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload_name:
+        description: 'Name for the uploaded artifact'
+        required: false
+        default: 'TachiyomiSY-arm64-release'
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build ARM64 Release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Check code format
+        run: ./gradlew spotlessCheck
+
+      - name: Build dev release APK
+        run: ./gradlew assembleDevRelease
+        timeout-minutes: 15
+
+      - name: Prepare ARM64 APK artifact
+        run: |
+          set -e
+          
+          # Find the ARM64 APK file
+          ARM64_APK=$(find app/build/outputs/apk/dev/release -name "*arm64-v8a*.apk" | head -n1)
+          
+          if [ -z "$ARM64_APK" ]; then
+            echo "Error: ARM64 APK not found!"
+            echo "Available APK files:"
+            find app/build/outputs/apk/dev/release -name "*.apk" || echo "No APK files found"
+            exit 1
+          fi
+          
+          echo "Found ARM64 APK: $ARM64_APK"
+          
+          # Copy and rename the APK
+          cp "$ARM64_APK" TachiyomiSY-arm64-v8a-dev-release.apk
+          
+          # Generate checksum
+          sha256sum TachiyomiSY-arm64-v8a-dev-release.apk > TachiyomiSY-arm64-v8a-dev-release.apk.sha256
+          
+          # Display file info
+          ls -la TachiyomiSY-arm64-v8a-dev-release.apk*
+          echo "APK size: $(du -h TachiyomiSY-arm64-v8a-dev-release.apk | cut -f1)"
+          echo "SHA256: $(cat TachiyomiSY-arm64-v8a-dev-release.apk.sha256)"
+
+      - name: Upload ARM64 APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.inputs.upload_name || 'TachiyomiSY-arm64-release' }}
+          path: |
+            TachiyomiSY-arm64-v8a-dev-release.apk
+            TachiyomiSY-arm64-v8a-dev-release.apk.sha256
+          retention-days: 30
+          compression-level: 0
